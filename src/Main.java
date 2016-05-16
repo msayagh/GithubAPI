@@ -1,4 +1,5 @@
 import java.io.IOException;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -11,29 +12,44 @@ import org.kohsuke.github.PagedIterable;
 public class Main {
 
 	public static void main(String[] args) throws IOException {
-		// args[0] : your github login
-		// args[1] : your github password
-		GitHub github = GitHub.connectUsingPassword(args[0], args[1]);
-		// Extract all the GitHub public repositories 
-		PagedIterable<GHRepository> repositories = github.listAllPublicRepositories();
-		for (GHRepository ghRepository : repositories) {
-			try {
-				// Apparently, ghRepository.getLanguage() is not working, so I developed javaIsPrimaryLanguage
-				if (javaIsPrimaryLanguage(ghRepository)) {
-					
-					System.out.println(ghRepository.getUrl());
-					/*
-					 * The following code allows to traverse the content of a repository
-					 */
-					/*
-					 List<GHContent> content = ghRepository.getDirectoryContent("");
+		// args[0] : start from project id 
+		List<User> users = new LinkedList<User>();
 
-					for (GHContent ghContent : content) {
-					//	System.out.println(ghContent.getName());
-					}*/
+		for (int i = 1 ; i < args.length; i = i + 2) {
+			users.add(new User(args[i], args[i+1]));
+		}
+
+		int nbreUser = 0;
+
+		int total = 0; 
+		int javaProjects = 0;
+		String since = "0";
+		for (User user : users) {
+			GitHub github = GitHub.connectUsingPassword(user.getUsername(), user.getPassword());
+			// Extract all the GitHub public repositories 
+			PagedIterable<GHRepository> repositories = github.listAllPublicRepositories(
+					since);
+			List<String> listJavaProjects = new LinkedList<String>();
+			for (GHRepository ghRepository : repositories) {
+				total ++;
+				try {
+					// Apparently, ghRepository.getLanguage() is not working, 
+					// so I developed javaIsPrimaryLanguage
+					if (javaIsPrimaryLanguage(ghRepository)) {
+						javaProjects ++;
+						System.out.println(ghRepository.getFullName());
+						listJavaProjects.add(ghRepository.getFullName());
+					}
+					if (total == 4000*(nbreUser + 1)) {
+						since = ghRepository.getId() + "";
+						nbreUser ++;
+						break;
+					}
+					System.err.println("FROM : " + since + " : " + javaProjects + " / " + total);
+				} catch (Exception e) {
 				}
-			} catch (Exception e) {
 			}
+
 		}
 
 	}
