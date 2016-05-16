@@ -25,7 +25,14 @@ public class Main {
 		int javaProjects = 0;
 		String since = "0";
 		for (User user : users) {
-			GitHub github = GitHub.connectUsingPassword(user.getUsername(), user.getPassword());
+			GitHub github  = null;
+			try
+			{
+				github = GitHub.connectUsingPassword(user.getUsername(), user.getPassword());
+			} catch (Exception e) {
+				System.err.println("Authentification failed : " + user.getUsername() + " / " + user.getPassword());
+				continue;
+			}
 			// Extract all the GitHub public repositories 
 			PagedIterable<GHRepository> repositories = github.listAllPublicRepositories(
 					since);
