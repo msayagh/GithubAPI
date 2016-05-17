@@ -20,10 +20,10 @@ public class ImportsAnalyzerMain {
 			String user = users.get(j);
 			String login = user.split(" ")[0];
 			String pwd = user.split(" ")[1];
-			
+
 			printMap(currentJavaProject, 
 					ImportsAnalyzer.get_File_Imports(login, pwd, currentJavaProject));
-			
+
 			if (j == users.size() - 1) {
 				j = 0;
 			}
@@ -32,13 +32,15 @@ public class ImportsAnalyzerMain {
 	}
 
 	public static void printMap (String javaProject, Map<String, List<String>> imports) {
-		for (String key : imports.keySet()) {
-			if (imports.get(key) != null) {
-				for (String imp : imports.get(key)) {
-					System.out.println(javaProject + "," + key + "," + imp);
+		if (imports != null) {
+			for (String key : imports.keySet()) {
+				if (imports.get(key) != null) {
+					for (String imp : imports.get(key)) {
+						System.out.println(javaProject + "," + key + "," + imp);
+					}
 				}
 			}
 		}
 	}
-	
+
 }

@@ -36,18 +36,23 @@ public class ImportsAnalyzer {
 		// args[0] : your github login
 		// args[1] : your github password
 		// args[2] : repository address
-		GitHub github = GitHub.connectUsingPassword(login, pwd);
-		GHRepository ghRepository = github.getRepository(repository);
+		try {
+			System.out.println("Line to remove by grep :" + login + " - " + pwd + " - " + repository);
+			GitHub github = GitHub.connectUsingPassword(login, pwd);
+			GHRepository ghRepository = github.getRepository(repository);
 
-		List<GHContent> javaFiles = getJavaFiles(ghRepository, 
-				ghRepository.getDirectoryContent(""));
+			List<GHContent> javaFiles = getJavaFiles(ghRepository, 
+					ghRepository.getDirectoryContent(""));
 
-		Map<String, List<String>> imports = new HashMap<String, List<String>>();
-		for (GHContent javaFile : javaFiles) {
-			imports.put(javaFile.getPath(), getImports(javaFile));
+			Map<String, List<String>> imports = new HashMap<String, List<String>>();
+			for (GHContent javaFile : javaFiles) {
+				imports.put(javaFile.getPath(), getImports(javaFile));
+			}
+			return imports;
+		} catch (Exception e) {
+			System.out.println("Line to remove by grep - Eror :" + login + " - " + pwd + " - " + repository);
+			return null;
 		}
-		
-		return imports;
 
 	}
 
