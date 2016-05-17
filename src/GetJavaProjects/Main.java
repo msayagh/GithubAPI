@@ -1,3 +1,5 @@
+package GetJavaProjects;
+
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
@@ -7,6 +9,8 @@ import org.kohsuke.github.GHContent;
 import org.kohsuke.github.GHRepository;
 import org.kohsuke.github.GitHub;
 import org.kohsuke.github.PagedIterable;
+
+import Users.User;
 
 
 public class Main {

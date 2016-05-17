@@ -1,3 +1,4 @@
+package ImportsPackage;
 import japa.parser.JavaParser;
 import japa.parser.ParseException;
 import japa.parser.ast.CompilationUnit;
@@ -21,13 +22,22 @@ import fileUtilities.WritingUtilities;
 
 public class ImportsAnalyzer {
 
-	public static void main(String[] args) throws IOException {
+	/**
+	 * THis method gets a map of files and imported packages
+	 * 
+	 * @param login : user login
+	 * @param pwd : password of the user
+	 * @param repository : repository name to get its imports
+	 * @return a map between each file and its import statements
+	 * @throws IOException
+	 */
+	public static Map<String, List<String>> get_File_Imports(String login, 
+			String pwd, String repository) throws IOException {
 		// args[0] : your github login
 		// args[1] : your github password
 		// args[2] : repository address
-		// args[3] : import statement
-		GitHub github = GitHub.connectUsingPassword(args[0], args[1]);
-		GHRepository ghRepository = github.getRepository(args[2]);
+		GitHub github = GitHub.connectUsingPassword(login, pwd);
+		GHRepository ghRepository = github.getRepository(repository);
 
 		List<GHContent> javaFiles = getJavaFiles(ghRepository, 
 				ghRepository.getDirectoryContent(""));
@@ -36,17 +46,8 @@ public class ImportsAnalyzer {
 		for (GHContent javaFile : javaFiles) {
 			imports.put(javaFile.getPath(), getImports(javaFile));
 		}
-
-		for (String key : imports.keySet()) {
-			if (imports.get(key) != null) {
-				System.out.println(key);
-				for (String imp : imports.get(key)) {
-					System.out.println("\t" + imp);
-				}
-			} else {
-				System.err.println("Parse error : " + key);
-			}
-		}
+		
+		return imports;
 
 	}
 
@@ -55,13 +56,12 @@ public class ImportsAnalyzer {
 		/*
 		 * The following code allows to traverse the content of a repository
 		 */
-
 		for (GHContent ghContent : content) {
 			if (ghContent.isDirectory()) {
 				javaFiles.addAll(getJavaFiles(repository, 
 						repository.getDirectoryContent(ghContent.getPath())));
 			} else {
-				if (isJavaFile(ghContent.getName())) {
+				if (ghContent.getName().endsWith(".java")) {
 					javaFiles.add(ghContent);
 				}
 			}
@@ -69,11 +69,6 @@ public class ImportsAnalyzer {
 
 		return javaFiles;
 
-	}
-
-	private static boolean isJavaFile(String name) {
-		// TODO Auto-generated method stub
-		return name.endsWith(".java");
 	}
 
 	private static List<String> getImports (GHContent javaFile) throws IOException {
@@ -91,21 +86,5 @@ public class ImportsAnalyzer {
 		return null;
 	}
 
-	/**
-	 * Simple visitor implementation for visiting MethodDeclaration nodes. 
-	 */
-	private static class ImportVisitor extends VoidVisitorAdapter {
 
-		private List<String> imports = new LinkedList<String>();
-
-		@Override
-		public void visit(final ImportDeclaration n, Object arg) {
-			imports.add(n.getName().toString());
-			super.visit(n, arg);
-		}
-		public List<String> getImports () {
-			return this.imports;
-		}
-
-	}
 }
