@@ -23,38 +23,39 @@ public class Main {
 
 		int total = 0; 
 		int javaProjects = 0;
-		String since = "0";
+		String since = args[0];
 		for (User user : users) {
 			GitHub github  = null;
 			try
 			{
 				github = GitHub.connectUsingPassword(user.getUsername(), user.getPassword());
+
+				// Extract all the GitHub public repositories 
+				PagedIterable<GHRepository> repositories = github.listAllPublicRepositories(
+						since);
+				List<String> listJavaProjects = new LinkedList<String>();
+				for (GHRepository ghRepository : repositories) {
+					total ++;
+					try {
+						// Apparently, ghRepository.getLanguage() is not working, 
+						// so I developed javaIsPrimaryLanguage
+						if (javaIsPrimaryLanguage(ghRepository)) {
+							javaProjects ++;
+							System.out.println(ghRepository.getFullName());
+							listJavaProjects.add(ghRepository.getFullName());
+						}
+						if (total == 4000*(nbreUser + 1)) {
+							since = ghRepository.getId() + "";
+							nbreUser ++;
+							break;
+						}
+						System.err.println("FROM : " + since + " : " + javaProjects + " / " + total);
+					} catch (Exception e) {
+					}
+				}
 			} catch (Exception e) {
 				System.err.println("Authentification failed : " + user.getUsername() + " / " + user.getPassword());
 				continue;
-			}
-			// Extract all the GitHub public repositories 
-			PagedIterable<GHRepository> repositories = github.listAllPublicRepositories(
-					since);
-			List<String> listJavaProjects = new LinkedList<String>();
-			for (GHRepository ghRepository : repositories) {
-				total ++;
-				try {
-					// Apparently, ghRepository.getLanguage() is not working, 
-					// so I developed javaIsPrimaryLanguage
-					if (javaIsPrimaryLanguage(ghRepository)) {
-						javaProjects ++;
-						System.out.println(ghRepository.getFullName());
-						listJavaProjects.add(ghRepository.getFullName());
-					}
-					if (total == 4000*(nbreUser + 1)) {
-						since = ghRepository.getId() + "";
-						nbreUser ++;
-						break;
-					}
-					System.err.println("FROM : " + since + " : " + javaProjects + " / " + total);
-				} catch (Exception e) {
-				}
 			}
 
 		}
