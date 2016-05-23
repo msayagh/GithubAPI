@@ -33,7 +33,7 @@ public class Main {
 			try
 			{
 				github = GitHub.connectUsingPassword(user.getUsername(), user.getPassword());
-
+				
 				// Extract all the GitHub public repositories 
 				PagedIterable<GHRepository> repositories = github.listAllPublicRepositories(
 						since);

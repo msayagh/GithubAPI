@@ -46,7 +46,8 @@ public class ImportsAnalyzer {
 
 			Map<String, List<String>> imports = new HashMap<String, List<String>>();
 			for (GHContent javaFile : javaFiles) {
-				imports.put(javaFile.getPath(), getImports(javaFile));
+				List<String> importLines = getImports(javaFile);
+				imports.put(javaFile.getPath(), importLines);
 			}
 			return imports;
 		} catch (Exception e) {
@@ -78,17 +79,17 @@ public class ImportsAnalyzer {
 
 	private static List<String> getImports (GHContent javaFile) throws IOException {
 
-		CompilationUnit cu;
-		// parse the file
 		try {
+			CompilationUnit cu;
+			// parse the file
 			cu = JavaParser.parse(javaFile.read());
 			ImportVisitor visitor = new ImportVisitor();
 			visitor.visit(cu, null);
 			return visitor.getImports();
 
-		} catch (ParseException e) {
+		} catch (Throwable e) {
+			return null;
 		}
-		return null;
 	}
 
 

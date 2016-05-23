@@ -38,6 +38,8 @@ public class ImportsAnalyzerMain {
 					for (String imp : imports.get(key)) {
 						System.out.println(javaProject + "," + key + "," + imp);
 					}
+				} else {
+					System.out.println(javaProject + "," + key + ",parsing error");
 				}
 			}
 		}
